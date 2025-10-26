@@ -662,7 +662,7 @@ begin
    DummyArgs:=TPasJSONItemObject.Create;
    try
     DummyArgs.Add('argument_needle',TPasJSONItemString.Create('print(''Hello, World!'')'));
-    
+
     ToolCall1:=TPasJSONItemObject.Create;
     try
      ToolCall1.Add('id',TPasJSONItemString.Create('call_1___'));
@@ -717,104 +717,110 @@ begin
   
   // Test parallel tool calls if tool calls are supported
   if TPinjaChatTemplateCapability.SupportsToolCalls in fCapabilities then begin
-   ToolCall1:=TPasJSONItemObject.Create;
+   DummyArgs:=TPasJSONItemObject.Create;
    try
-    ToolCall1.Add('id',TPasJSONItemString.Create('call_1___'));
-    ToolCall1.Add('type',TPasJSONItemString.Create('function'));
-    ToolCallFunc:=TPasJSONItemObject.Create;
+    DummyArgs.Add('argument_needle',TPasJSONItemString.Create('print(''Hello, World!'')'));
+    ToolCall1:=TPasJSONItemObject.Create;
     try
-     ToolCallFunc.Add('name',TPasJSONItemString.Create('test_tool1'));
-     if TPinjaChatTemplateCapability.RequiresObjectArguments in fCapabilities then begin
-      ToolCallFunc.Add('arguments',DummyArgs.Clone);
-     end else begin
-      ToolCallFunc.Add('arguments',TPasJSONItemString.Create('{"argument_needle":"print(''Hello, World'')"}'));
-     end;
-     ToolCall1.Add('function',ToolCallFunc.Clone);
-    finally
-     FreeAndNil(ToolCallFunc);
-    end;
-    
-    ToolCall2:=TPasJSONItemObject.Create;
-    try
-     ToolCall2.Add('id',TPasJSONItemString.Create('call_2___'));
-     ToolCall2.Add('type',TPasJSONItemString.Create('function'));
+     ToolCall1.Add('id',TPasJSONItemString.Create('call_1___'));
+     ToolCall1.Add('type',TPasJSONItemString.Create('function'));
      ToolCallFunc:=TPasJSONItemObject.Create;
      try
-      ToolCallFunc.Add('name',TPasJSONItemString.Create('test_tool2'));
+      ToolCallFunc.Add('name',TPasJSONItemString.Create('test_tool1'));
       if TPinjaChatTemplateCapability.RequiresObjectArguments in fCapabilities then begin
        ToolCallFunc.Add('arguments',DummyArgs.Clone);
       end else begin
        ToolCallFunc.Add('arguments',TPasJSONItemString.Create('{"argument_needle":"print(''Hello, World'')"}'));
       end;
-      ToolCall2.Add('function',ToolCallFunc.Clone);
+      ToolCall1.Add('function',ToolCallFunc.Clone);
      finally
       FreeAndNil(ToolCallFunc);
      end;
-     
-     ToolCallsArray:=TPasJSONItemArray.Create;
+
+     ToolCall2:=TPasJSONItemObject.Create;
      try
-      ToolCallsArray.Add(ToolCall1.Clone);
-      ToolCallsArray.Add(ToolCall2.Clone);
-      
-      AssistantMsg:=TPasJSONItemObject.Create;
+      ToolCall2.Add('id',TPasJSONItemString.Create('call_2___'));
+      ToolCall2.Add('type',TPasJSONItemString.Create('function'));
+      ToolCallFunc:=TPasJSONItemObject.Create;
       try
-       AssistantMsg.Add('role',TPasJSONItemString.Create('assistant'));
-       if TPinjaChatTemplateCapability.RequiresNonNullContent in fCapabilities then begin
-        AssistantMsg.Add('content',TPasJSONItemString.Create(''));
+       ToolCallFunc.Add('name',TPasJSONItemString.Create('test_tool2'));
+       if TPinjaChatTemplateCapability.RequiresObjectArguments in fCapabilities then begin
+        ToolCallFunc.Add('arguments',DummyArgs.Clone);
+       end else begin
+        ToolCallFunc.Add('arguments',TPasJSONItemString.Create('{"argument_needle":"print(''Hello, World'')"}'));
        end;
-       AssistantMsg.Add('tool_calls',ToolCallsArray.Clone);
-       
-       TestMessages:=TPasJSONItemArray.Create;
+       ToolCall2.Add('function',ToolCallFunc.Clone);
+      finally
+       FreeAndNil(ToolCallFunc);
+      end;
+
+      ToolCallsArray:=TPasJSONItemArray.Create;
+      try
+       ToolCallsArray.Add(ToolCall1.Clone);
+       ToolCallsArray.Add(ToolCall2.Clone);
+
+       AssistantMsg:=TPasJSONItemObject.Create;
        try
-        TestMessages.Add(DummyUserMsg.Clone);
-        TestMessages.Add(AssistantMsg.Clone);
-        
-        OutString:=TryRawRender(TestMessages,nil,false,false);
-        if (Pos('test_tool1',OutString)>0) and (Pos('test_tool2',OutString)>0) then begin
-         Include(fCapabilities,TPinjaChatTemplateCapability.SupportsParallelToolCalls);
+        AssistantMsg.Add('role',TPasJSONItemString.Create('assistant'));
+        if TPinjaChatTemplateCapability.RequiresNonNullContent in fCapabilities then begin
+         AssistantMsg.Add('content',TPasJSONItemString.Create(''));
         end;
-       finally
-        FreeAndNil(TestMessages);
-       end;
-       
-       // Test tool responses (while we still have ToolCall1 available)
-       ToolResponseMsg:=TPasJSONItemObject.Create;
-       try
-        ToolResponseMsg.Add('role',TPasJSONItemString.Create('tool'));
-        ToolResponseMsg.Add('name',TPasJSONItemString.Create('test_tool1'));
-        ToolResponseMsg.Add('content',TPasJSONItemString.Create('Some response!'));
-        ToolResponseMsg.Add('tool_call_id',TPasJSONItemString.Create('call_911_'));
-        
+        AssistantMsg.Add('tool_calls',ToolCallsArray.Clone);
+
         TestMessages:=TPasJSONItemArray.Create;
         try
          TestMessages.Add(DummyUserMsg.Clone);
-         TestMessages.Add(ToolCall1.Clone);  // Clone the first tool call
-         TestMessages.Add(ToolResponseMsg.Clone);
-         
+         TestMessages.Add(AssistantMsg.Clone);
+
          OutString:=TryRawRender(TestMessages,nil,false,false);
-         if Pos('Some response!',OutString)>0 then begin
-          Include(fCapabilities,TPinjaChatTemplateCapability.SupportsToolResponses);
-         end;
-         if Pos('call_911_',OutString)>0 then begin
-          Include(fCapabilities,TPinjaChatTemplateCapability.SupportsToolCallId);
+         if (Pos('test_tool1',OutString)>0) and (Pos('test_tool2',OutString)>0) then begin
+          Include(fCapabilities,TPinjaChatTemplateCapability.SupportsParallelToolCalls);
          end;
         finally
          FreeAndNil(TestMessages);
         end;
+
+        // Test tool responses (while we still have ToolCall1 available)
+        ToolResponseMsg:=TPasJSONItemObject.Create;
+        try
+         ToolResponseMsg.Add('role',TPasJSONItemString.Create('tool'));
+         ToolResponseMsg.Add('name',TPasJSONItemString.Create('test_tool1'));
+         ToolResponseMsg.Add('content',TPasJSONItemString.Create('Some response!'));
+         ToolResponseMsg.Add('tool_call_id',TPasJSONItemString.Create('call_911_'));
+
+         TestMessages:=TPasJSONItemArray.Create;
+         try
+          TestMessages.Add(DummyUserMsg.Clone);
+          TestMessages.Add(ToolCall1.Clone);  // Clone the first tool call
+          TestMessages.Add(ToolResponseMsg.Clone);
+
+          OutString:=TryRawRender(TestMessages,nil,false,false);
+          if Pos('Some response!',OutString)>0 then begin
+           Include(fCapabilities,TPinjaChatTemplateCapability.SupportsToolResponses);
+          end;
+          if Pos('call_911_',OutString)>0 then begin
+           Include(fCapabilities,TPinjaChatTemplateCapability.SupportsToolCallId);
+          end;
+         finally
+          FreeAndNil(TestMessages);
+         end;
+        finally
+         FreeAndNil(ToolResponseMsg);
+        end;
        finally
-        FreeAndNil(ToolResponseMsg);
+        FreeAndNil(AssistantMsg);
        end;
       finally
-       FreeAndNil(AssistantMsg);
+       FreeAndNil(ToolCallsArray);
       end;
      finally
-      FreeAndNil(ToolCallsArray);
+      FreeAndNil(ToolCall2);
      end;
     finally
-     FreeAndNil(ToolCall2);
+     FreeAndNil(ToolCall1);
     end;
    finally
-    FreeAndNil(ToolCall1);
+    FreeAndNil(DummyArgs);
    end;
   end;
   
