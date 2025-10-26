@@ -1,7 +1,7 @@
 ﻿(******************************************************************************
  *                                   Pinja                                    *
  ******************************************************************************
- *                        Version 2025-08-18-06-01-0000                       *
+ *                        Version 2025-10-26-16-26-0000                       *
  ******************************************************************************
  *                                zlib license                                *
  *============================================================================*
@@ -354,6 +354,8 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
      PPinjaRawByteString=^TPinjaRawByteString;
      PPPinjaRawByteString=^PPinjaRawByteString;
 
+     TPinjaObjectList=Contnrs.TObjectList; // wokaround for fpc <=3.2.2 (3.3.1 has fixed it)
+
      TPinja=class
       public
 
@@ -695,16 +697,16 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
 
             TNodeExpressionArgumentList=class
              private
-              fPos:TObjectList;   // of TNodeExpression
+              fPos:TPinjaObjectList;   // of TNodeExpression
               fKwNames:TStringList;
-              fKwVals:TObjectList; // of TNodeExpression
+              fKwVals:TPinjaObjectList; // of TNodeExpression
              public
               constructor Create;
               destructor Destroy; override;
              published
-              property Pos:TObjectList read fPos;
+              property Pos:TPinjaObjectList read fPos;
               property KwNames:TStringList read fKwNames;
-              property KwVals:TObjectList read fKwVals;
+              property KwVals:TPinjaObjectList read fKwVals;
             end;
 
             TNodeExpressionCallName=class(TNodeExpression)
@@ -739,7 +741,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
              private
               fBase:TNodeExpression;
               fNames:TStringList;
-              fArgSets:TObjectList; // of TNodeExpressionArgumentList
+              fArgSets:TPinjaObjectList; // of TNodeExpressionArgumentList
              public
               constructor Create(aBase:TNodeExpression);
               destructor Destroy; override;
@@ -748,7 +750,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
              published
               property Base:TNodeExpression read fBase;
               property Names:TStringList read fNames;
-              property ArgSets:TObjectList read fArgSets;
+              property ArgSets:TPinjaObjectList read fArgSets;
             end;
 
             TNodeExpressionUnary=class(TNodeExpression)
@@ -961,28 +963,28 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
 
             TNodeExpressionArrayLit=class(TNodeExpression)
              private
-              fItems:TObjectList; // of TNodeExpression
+              fItems:TPinjaObjectList; // of TNodeExpression
              public
               constructor Create;
               destructor Destroy; override;
               procedure Add(aExpression:TNodeExpression);
               function Eval(const aContext:TContext):TValue; override;
              published
-              property Items:TObjectList read fItems;        
+              property Items:TPinjaObjectList read fItems;
             end;
 
             TNodeExpressionDictLit=class(TNodeExpression)
              private
-              fKeys:TObjectList;  // of TNodeExpression
-              fVals:TObjectList;  // of TNodeExpression
+              fKeys:TPinjaObjectList;  // of TNodeExpression
+              fVals:TPinjaObjectList;  // of TNodeExpression
              public
               constructor Create;
               destructor Destroy; override;
               procedure Add(aKey,aVal:TNodeExpression);
               function Eval(const aContext:TContext):TValue; override;
              published
-              property Keys:TObjectList read fKeys;
-              property Vals:TObjectList read fVals;         
+              property Keys:TPinjaObjectList read fKeys;
+              property Vals:TPinjaObjectList read fVals;
             end;
 
             TNodeExpressionTernary=class(TNodeExpression)
@@ -1036,14 +1038,14 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
 
             TNodeStatementBlock=class(TNodeStatement)
              private
-              fItems:TObjectList; // of TNodeStatement
+              fItems:TPinjaObjectList; // of TNodeStatement
              public
               constructor Create;
               destructor Destroy; override;
               procedure Add(aNode:TNodeStatement);
               procedure Render(const aContext:TContext;const aOutput:TRawByteStringOutput); override;
              published
-              property Items:TObjectList read fItems; 
+              property Items:TPinjaObjectList read fItems;
             end;
 
             TNodeStatementSet=class(TNodeStatement)
@@ -1075,8 +1077,8 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
 
             TNodeStatementIf=class(TNodeStatement)
              private
-              fConditions:TObjectList; // of TNodeExpression
-              fBodies:TObjectList; // of TNodeStatementBlock
+              fConditions:TPinjaObjectList; // of TNodeExpression
+              fBodies:TPinjaObjectList; // of TNodeStatementBlock
               fElseBody:TNodeStatementBlock;
              public
               constructor Create;
@@ -1085,8 +1087,8 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
               procedure SetElse(aBody:TNodeStatementBlock);
               procedure Render(const aContext:TContext;const aOutput:TRawByteStringOutput); override;
              published
-              property Conditions:TObjectList read fConditions;
-              property Bodies:TObjectList read fBodies;
+              property Conditions:TPinjaObjectList read fConditions;
+              property Bodies:TPinjaObjectList read fBodies;
               property ElseBody:TNodeStatementBlock read fElseBody;
             end;
 
@@ -1123,7 +1125,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
             TNodeStatementFilterBlock=class(TNodeStatement)
              private
               fNames:TStringList;
-              fArgSets:TObjectList; // of TNodeExpressionArgumentList
+              fArgSets:TPinjaObjectList; // of TNodeExpressionArgumentList
               fBody:TNodeStatementBlock;
              public
               constructor Create(aBody:TNodeStatementBlock);
@@ -1132,7 +1134,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
               procedure Render(const aContext:TContext;const aOutput:TRawByteStringOutput); override;
              published
               property Names:TStringList read fNames;
-              property ArgSets:TObjectList read fArgSets;
+              property ArgSets:TPinjaObjectList read fArgSets;
               property Body:TNodeStatementBlock read fBody;
             end;
 
@@ -1142,7 +1144,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
               fName:TPinjaRawByteString;
               fPosNames:TStringList;   // ordered positional names
               fKwNames:TStringList;    // kw-only names (order preserved)
-              fKwDefs:TObjectList;     // of TNodeExpression default expressions
+              fKwDefs:TPinjaObjectList;     // of TNodeExpression default expressions
               fBody:TNodeStatementBlock;
              public
               constructor Create(const aName:TPinjaRawByteString;aBody:TNodeStatementBlock);
@@ -1155,7 +1157,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
               property Name:TPinjaRawByteString read fName;
               property PosNames:TStringList read fPosNames;
               property KwNames:TStringList read fKwNames;
-              property KwDefs:TObjectList read fKwDefs;
+              property KwDefs:TPinjaObjectList read fKwDefs;
               property Body:TNodeStatementBlock read fBody;
             end;
 
@@ -5082,9 +5084,9 @@ end;
 constructor TPinja.TNodeExpressionArgumentList.Create;
 begin
  inherited Create;
- fPos:=TObjectList.Create(true);
+ fPos:=TPinjaObjectList.Create(true);
  fKwNames:=TStringList.Create;
- fKwVals:=TObjectList.Create(true);
+ fKwVals:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeExpressionArgumentList.Destroy;
@@ -5212,7 +5214,7 @@ begin
  inherited Create;
  fBase:=aBase;
  fNames:=TStringList.Create;
- fArgSets:=TObjectList.Create(true);
+ fArgSets:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeExpressionFilterPipe.Destroy;
@@ -6074,7 +6076,7 @@ end;
 constructor TPinja.TNodeExpressionArrayLit.Create;
 begin
  inherited Create;
- fItems:=TObjectList.Create(true);
+ fItems:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeExpressionArrayLit.Destroy;
@@ -6106,8 +6108,8 @@ end;
 constructor TPinja.TNodeExpressionDictLit.Create;
 begin
  inherited Create;
- fKeys:=TObjectList.Create(true);
- fVals:=TObjectList.Create(true);
+ fKeys:=TPinjaObjectList.Create(true);
+ fVals:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeExpressionDictLit.Destroy;
@@ -6232,7 +6234,7 @@ end;
 constructor TPinja.TNodeStatementBlock.Create;
 begin
  inherited Create;
- fItems:=TObjectList.Create(true);
+ fItems:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeStatementBlock.Destroy;
@@ -6327,8 +6329,8 @@ end;
 constructor TPinja.TNodeStatementIf.Create;
 begin
  inherited Create;
- fConditions:=TObjectList.Create(true);
- fBodies:=TObjectList.Create(true);
+ fConditions:=TPinjaObjectList.Create(true);
+ fBodies:=TPinjaObjectList.Create(true);
  fElseBody:=nil;
 end;
 
@@ -6554,7 +6556,7 @@ constructor TPinja.TNodeStatementFilterBlock.Create(aBody:TNodeStatementBlock);
 begin
  inherited Create;
  fNames:=TStringList.Create;
- fArgSets:=TObjectList.Create(true);
+ fArgSets:=TPinjaObjectList.Create(true);
  fBody:=aBody;
 end;
 
@@ -6634,7 +6636,7 @@ begin
  fBody:=aBody;
  fPosNames:=TStringList.Create;
  fKwNames:=TStringList.Create;
- fKwDefs:=TObjectList.Create(true);
+ fKwDefs:=TPinjaObjectList.Create(true);
 end;
 
 destructor TPinja.TNodeStatementMacroDefinition.Destroy;
@@ -7397,7 +7399,7 @@ end;
 // Template wrapper                                                              
 //==============================================================================
 
-function ExtractParts(const aSource:TPinjaRawByteString;const aOptions:TPinja.TOptions;aParts:TObjectList):TPinjaInt32;
+function ExtractParts(const aSource:TPinjaRawByteString;const aOptions:TPinja.TOptions;aParts:TPinjaObjectList):TPinjaInt32;
 var Position,SourceLength:TPinjaInt32;
     StartPosition:TPinjaInt32;
     SliceText,TagText,ExpressionText:TPinjaRawByteString;
@@ -7618,7 +7620,7 @@ begin
  end;
 end;
 
-function BuildAST(const aParts:TObjectList):TPinja.TNodeStatementBlock;
+function BuildAST(const aParts:TPinjaObjectList):TPinja.TNodeStatementBlock;
 
  function IsMarker(aObj:TObject):Boolean;
  begin
@@ -8107,11 +8109,11 @@ begin
 end;
 
 constructor TPinja.TTemplate.Create(const aSource:TPinjaRawByteString;const aOptions:TOptions);
-var Parts:TObjectList;
+var Parts:TPinjaObjectList;
 begin
  inherited Create;
  fOptions:=aOptions;
- Parts:=TObjectList.Create(false);
+ Parts:=TPinjaObjectList.Create(false);
  try
   ExtractParts(aSource,aOptions,Parts);
   fRoot:=BuildAST(Parts);
