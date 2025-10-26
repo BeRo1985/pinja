@@ -354,7 +354,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
      PPinjaRawByteString=^TPinjaRawByteString;
      PPPinjaRawByteString=^PPinjaRawByteString;
 
-     TPinjaObjectList=Contnrs.TObjectList; // wokaround for fpc <=3.2.2 (3.3.1 has fixed it)
+     TPinjaObjectList=Contnrs.TObjectList; // workaround for fpc <=3.2.2 (3.3.1 has fixed it)
 
      TPinja=class
       public
