@@ -356,7 +356,7 @@ type TPinjaInt8={$if declared(Int8)}Int8{$else}ShortInt{$ifend};
 
      TPinjaObjectList=Contnrs.TObjectList; // workaround for fpc <=3.2.2 (3.3.1 has fixed it)
 
-     TPinja=class
+     TPinja=class // main class for Pinja
       public
 
         //==========================================================================
