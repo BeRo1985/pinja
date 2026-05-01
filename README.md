@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> The primary repository has moved to [git.rosseaux.net/BeRo1985/pinja](https://git.rosseaux.net/BeRo1985/pinja).
+> This GitHub repository is kept up-to-date via push mirroring.
+
 # Pinja
 
 Pinja is a Jinja-subset-compatible template engine for Object Pascal. It's primarily designed for usage with PasLLM for Large Language Model applications, since LLM models have often Jinja templates built-in for prompt processing. But it can be used in any Object Pascal application for other purposes as well, where a lightweight Jinja-like template engine is needed.
